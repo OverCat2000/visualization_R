@@ -1,7 +1,6 @@
 library(ggplot2)
 library(dplyr)
 library(plyr)
-library(ggwordcloud)
 library(stringr)
 
 attach(Crime_Data_from_2020_to_Present)

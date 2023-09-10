@@ -2,6 +2,7 @@ library(dplyr)
 library(ggplot2)
 library(plyr)
 library(stringr)
+library(gridExtra)
 
 df = Crime_Data_from_2020_to_Present
 dft = sample_n(df, 1000)
@@ -54,6 +55,10 @@ ggplot(data = subset(df, year != 2023), aes(x = weekDay)) +
 #rounding time to the hour
 df$time = format(round(as.POSIXct(df$`TIME OCC`, format = "%H%M"), units = "hours"), format = "%H:%M")
 
+df$ctime = format(as.POSIXct(df$`TIME OCC`, format = "%H%M"), format = "%H:%M")
+
+df[, c("ctime", "TIME OCC")]
+
 ggplot(df, aes(x = time)) +
   geom_bar() +
   theme(axis.text.x = element_text(size = 10, angle = 75, hjust = 1))
@@ -71,20 +76,32 @@ race = c("asian", "black", "chinese", "cambodian",
          "white", "unknown", "asian indina")
 
 df$race = mapvalues(df$`Vict Descent`, from = descent, to = race)
+table(df$race)
 people = table(df$race)
 people = as.data.frame(people[people > 15000])
+people
+total = sum(people$Freq)
 
-ggplot(data= people, aes(x = reorder(Var1, Freq), y = Freq)) +
-  geom_bar(stat = "identity", fill = "lightgreen") + 
+ggplot(data= people, aes(x = "",y = Freq, fill = Var1)) +
+  geom_bar(stat = "identity") +
+  coord_polar("y", start = 0) +
   labs(x = "race", y = "count", title = "victims by race") +
-  theme_dark()
+  geom_text(aes(label = paste0(round(Freq/total*100, 2), "%")), position = position_stack(vjust= 0.5)) +
+  theme_void()
+
+
+df$stdTime = as.Date(df$`DATE OCC`, format = "%m/%d/%Y")
+
+p1 = ggplot(data = df, aes(y = `Vict Age`)) +
+  geom_boxplot(color = "coral", fill = "cadetblue") +
+  theme_grey()
+p2 = ggplot(data = subset(df, `Vict Age`!= 0), aes(x = `Vict Age`)) +
+  geom_histogram(fill = "cadetblue", color = "coral") +
+  theme_grey()
+grid.arrange(p1, p2, nrow = 1)
+
 
 View(df)
-
-
-
-
-
 
 
 

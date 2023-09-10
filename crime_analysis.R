@@ -9,7 +9,6 @@ battery = df%>%
 table(battery$`Crm Cd Desc`)
 battery = battery %>%
   mutate(crimeType = "battery")
-View(battery)
 
 
 theft = df%>%
@@ -21,19 +20,16 @@ shoplifting = df%>%
   filter(str_detect(`Crm Cd Desc`, "SHOPLIFTING")) %>%
   mutate(crimeType = "shoplifting")
 table(shoplifting$`Crm Cd Desc`)
-View(shoplifting)
 
 pickpoketing = df%>%
   filter(str_detect(`Crm Cd Desc`, "PICKPOCKET") | str_detect(`Crm Cd Desc`, "PURSE")) %>%
   mutate(crimeType = "pickpoketing")
 table(pickpoketing$`Crm Cd Desc`)
-View(pickpoketing)
 
 vehicle = df%>%
   filter(str_detect(`Crm Cd Desc`, "VEHICLE") & str_detect(`Crm Cd Desc`, "STOLEN")) %>%
   mutate(crimeType = "vehicle theft")
 table(vehicle$`Crm Cd Desc`)
-View(vehicle)
 
 robbery = df%>%
   filter(str_detect(`Crm Cd Desc`, "ROBBERY")) %>%
@@ -56,10 +52,13 @@ arson = df%>%
 table(arson$`Crm Cd Desc`)
 
 myCrime = rbind(battery, shoplifting, assault, vehicle, pickpoketing, arson, burglary, robbery, theft)
-table(myCrime$crimeType)
+tcrime = as.data.frame(table(myCrime$crimeType))
+tcrime
 
-ggplot(myCrime, aes(y = crimeType)) +
-  geom_bar(fill = "lightblue") +
+homicide = df%>%filter(`Crm Cd Desc` == "CRIMINAL HOMICIDE")
+
+ggplot(tcrime, aes(y = reorder(Var1, Freq), x = Freq)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
   labs(y = "crime type", title = "types of crime") + 
   theme_dark()
 
@@ -67,5 +66,5 @@ ggplot(data = subset(myCrime, !is.na(`Vict Sex`) & myCrime$`Vict Sex` != "H"), a
   geom_bar(position = "fill") +
   labs(x = "percentage", y = "crime type", title = "victime percentage by gender by crime type")
 
-
+View(myCrime)
 
